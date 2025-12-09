@@ -1,0 +1,2 @@
+otel-collector-contrib:
+  version: 0.139.0

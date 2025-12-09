@@ -1,0 +1,59 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+  filter/health_endpoint:
+    traces:
+      span:
+        - attributes["http.route"] == "/admin/health"
+  resource/no_process_command_args:
+    attributes:
+      - key: process.command_args
+        action: delete
+
+exporters:
+  debug:
+    verbosity: detailed
+  otlphttp/new_relic:
+    endpoint: ${env:NEWRELIC_ENDPOINT:-default_endpoint}
+    headers:
+      api-key: ${env:NEWRELIC_APIKEY:-default_apikey}
+
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+
+service:
+  extensions: [ health_check ]
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - filter/health_endpoint
+        - resource/no_process_command_args
+      exporters:
+        - ${env:EXPORTER:-debug}
+    metrics:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - resource/no_process_command_args
+      exporters:
+        - ${env:EXPORTER:-debug}
+    logs:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - resource/no_process_command_args
+      exporters:
+        - ${env:EXPORTER:-debug}

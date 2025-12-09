@@ -1,0 +1,18 @@
+services:
+  otel-collector-service:
+    image: local/otel-collector-service:latest
+    container_name: otel-collector-service
+    hostname: otel-collector-service-local
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "13133:13133"
+      - "55678:55678"
+      - "55679:55679"
+    networks:
+      - develop-network
+
+networks:
+  develop-network:
+    external: true
+    name: develop

@@ -1,0 +1,23 @@
+services:
+  surrealdb:
+    image: surrealdb/surrealdb:latest
+    container_name: surrealdb
+    hostname: surrealdb-local
+    user: root
+    ports:
+      - "8000:8000"
+    networks:
+      - develop-network
+    volumes:
+      - surrealdb-data:/data
+      - surrealdb-data:/logs
+    entrypoint: /surreal start --user root --pass root rocksdb:/data/mydatabase.db
+
+networks:
+  develop-network:
+    external: true
+    name: develop
+
+volumes:
+  surrealdb-data:
+    name: surrealdb-data

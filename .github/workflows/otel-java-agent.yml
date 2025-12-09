@@ -1,0 +1,44 @@
+name: Push otel-java-agent on updating main branch
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+    paths:
+      - .github/workflows/otel-java-agent.yml
+      - otel-java-agent/Dockerfile
+      - otel-java-agent/version.yaml
+
+env:
+  REGISTRY: davgeoand9
+  REPOSITORY: otel-java-agent
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get java version
+        id: lookupJavaVersion
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq '.java.version' 'otel-java-agent/version.yaml'
+
+      - name: Get otel version
+        id: lookupOtelVersion
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq '.otel-java-agent.version' 'otel-java-agent/version.yaml'
+
+      - name: docker login
+        run: |
+          docker login -u $REGISTRY -p ${{secrets.DOCKER_PASSWORD}}
+
+      - name: Push the Docker image
+        run: |
+          bash docker_image.sh $REPOSITORY prod ${{ steps.lookupJavaVersion.outputs.result }} ${{ steps.lookupOtelVersion.outputs.result }}
