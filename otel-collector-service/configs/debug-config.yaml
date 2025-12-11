@@ -12,18 +12,30 @@ processors:
     traces:
       span:
         - attributes["http.route"] == "/admin/health"
-  resource/no_process_command_args:
+  resource/drop_unneeded_resource_attributes:
     attributes:
+      - key: k8s.pod.start_time
+        action: delete
+      - key: os.description
+        action: delete
+      - key: os.type
+        action: delete
       - key: process.command_args
+        action: delete
+      - key: process.executable.path
+        action: delete
+      - key: process.pid
+        action: delete
+      - key: process.runtime.description
+        action: delete
+      - key: process.runtime.name
+        action: delete
+      - key: process.runtime.version
         action: delete
 
 exporters:
   debug:
     verbosity: detailed
-  otlphttp/new_relic:
-    endpoint: ${env:NEWRELIC_ENDPOINT:-default_endpoint}
-    headers:
-      api-key: ${env:NEWRELIC_APIKEY:-default_apikey}
 
 extensions:
   health_check:
@@ -38,22 +50,22 @@ service:
       processors:
         - batch
         - filter/health_endpoint
-        - resource/no_process_command_args
+        - resource/drop_unneeded_resource_attributes
       exporters:
-        - ${env:EXPORTER:-debug}
+        - debug
     metrics:
       receivers:
         - otlp
       processors:
         - batch
-        - resource/no_process_command_args
+        - resource/drop_unneeded_resource_attributes
       exporters:
-        - ${env:EXPORTER:-debug}
+        - debug
     logs:
       receivers:
         - otlp
       processors:
         - batch
-        - resource/no_process_command_args
+        - resource/drop_unneeded_resource_attributes
       exporters:
-        - ${env:EXPORTER:-debug}
+        - debug

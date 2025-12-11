@@ -1,0 +1,106 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+  filter/health_endpoint:
+    traces:
+      span:
+        - attributes["http.route"] == "/admin/health"
+  resource/drop_unneeded_resource_attributes:
+    attributes:
+      - key: k8s.pod.start_time
+        action: delete
+      - key: os.description
+        action: delete
+      - key: os.type
+        action: delete
+      - key: process.command_args
+        action: delete
+      - key: process.executable.path
+        action: delete
+      - key: process.pid
+        action: delete
+      - key: process.runtime.description
+        action: delete
+      - key: process.runtime.name
+        action: delete
+      - key: process.runtime.version
+        action: delete
+  resourcedetection:
+    detectors: [ "env", "system" ]
+    override: false
+  transform/add_resource_attributes_as_metric_attributes:
+    error_mode: ignore
+    metric_statements:
+      - context: datapoint
+        statements:
+          - set(attributes["deployment.environment"], resource.attributes["deployment.environment"])
+          - set(attributes["service.version"], resource.attributes["service.version"])
+
+exporters:
+  debug:
+    verbosity: detailed
+  otlphttp/grafana_cloud:
+    endpoint: ${env:GRAFANA_ENDPOINT:-default_endpoint}
+    auth:
+      authenticator: basicauth/grafana_cloud
+
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+  basicauth/grafana_cloud:
+    client_auth:
+      username: ${env:GRAFANA_USERNAME:-default_username}
+      password: ${env:GRAFANA_PASSWORD:-default_password}
+
+connectors:
+  grafanacloud:
+    host_identifiers: [ "host.name" ]
+
+service:
+  extensions:
+    - health_check
+    - basicauth/grafana_cloud
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - resource/drop_unneeded_resource_attributes
+        - resourcedetection
+      exporters:
+        - ${env:EXPORTER:-debug}
+        - grafanacloud
+    metrics:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - resource/drop_unneeded_resource_attributes
+        - resourcedetection
+        - transform/add_resource_attributes_as_metric_attributes
+      exporters:
+        - ${env:EXPORTER:-debug}
+    metrics/grafanacloud:
+      receivers:
+        - grafanacloud
+      processors:
+        - batch
+      exporters:
+        - ${env:EXPORTER:-debug}
+    logs:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - resource/drop_unneeded_resource_attributes
+        - resourcedetection
+      exporters:
+        - ${env:EXPORTER:-debug}

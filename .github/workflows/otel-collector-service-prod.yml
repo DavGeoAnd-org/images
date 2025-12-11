@@ -8,7 +8,7 @@ on:
       - closed
     paths:
       - .github/workflows/otel-collector-service-prod.yml
-      - otel-collector-service/config.yaml
+      - otel-collector-service/configs/*.yaml
       - otel-collector-service/Dockerfile
       - otel-collector-service/version.yaml
 
@@ -19,6 +19,7 @@ env:
   ECS_TASK_DEFINITION: otel-collector-service-prod
   ECS_TASK_DEFINITION_FILE: task-definition.json
   ECS_CLUSTER: homeproject-services-prod-ecs-cluster
+  CONFIG_TYPE: graf
 
 jobs:
   build:
@@ -41,7 +42,7 @@ jobs:
       - name: Push the Docker image
         id: push-image
         run: |
-          bash docker_image.sh $REPOSITORY prod ${{ steps.lookupOtelCollectorVersion.outputs.result }}
+          bash otel-collector-service/docker_build.sh $CONFIG_TYPE prod ${{ steps.lookupOtelCollectorVersion.outputs.result }}
 
       - name: Configure AWS Creds
         uses: aws-actions/configure-aws-credentials@v4
