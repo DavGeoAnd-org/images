@@ -9,7 +9,7 @@ on:
       - synchronize
     paths:
       - .github/workflows/otel-collector-service-test.yml
-      - otel-collector-service/config.yaml
+      - otel-collector-service/configs/*.yaml
       - otel-collector-service/Dockerfile
       - otel-collector-service/version.yaml
 
@@ -20,6 +20,7 @@ env:
   ECS_TASK_DEFINITION: otel-collector-service-test
   ECS_TASK_DEFINITION_FILE: task-definition.json
   ECS_CLUSTER: homeproject-services-test-ecs-cluster
+  CONFIG_TYPE: graf
 
 jobs:
   build:
@@ -42,7 +43,7 @@ jobs:
       - name: Push the Docker image
         id: push-image
         run: |
-          bash docker_image.sh $REPOSITORY test ${{ steps.lookupOtelCollectorVersion.outputs.result }} ${GITHUB_SHA::7}
+          bash otel-collector-service/docker_build.sh $CONFIG_TYPE test ${{ steps.lookupOtelCollectorVersion.outputs.result }} ${GITHUB_SHA::7}
 
       - name: Configure AWS Creds
         uses: aws-actions/configure-aws-credentials@v4
