@@ -1,6 +1,6 @@
 services:
   surrealdb:
-    image: surrealdb/surrealdb:latest
+    image: surrealdb/surrealdb:v2.4.0
     container_name: surrealdb
     hostname: surrealdb-local
     user: root
