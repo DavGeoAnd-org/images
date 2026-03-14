@@ -2,7 +2,7 @@
 name: Version Update - otel-java-agent
 about: update otel-java-agent version
 title: Version Update - otel-java-agent (Month Year)
-labels: image
+labels: image, monitoring
 assignees: DavGeoAnd
 
 ---
