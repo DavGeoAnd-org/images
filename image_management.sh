@@ -28,19 +28,24 @@ otel-collector-service() {
   fi
 }
 
+downloadOtelJavaAgent() {
+    wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v"${OTEL_JAVA_AGENT_VERSION}"/opentelemetry-javaagent.jar -P ./otel-java-agent
+}
+
 otel-java-agent() {
   JAVA_VERSION=${3:-$(yq '.java.version' ./otel-java-agent/version.yaml)}
   OTEL_JAVA_AGENT_VERSION=${4:-$(yq '.otel-java-agent.version' ./otel-java-agent/version.yaml)}
   echo "java.version: $JAVA_VERSION"
   echo "otel-java-agent.version: $OTEL_JAVA_AGENT_VERSION"
   echo "env: $env"
-  wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v"${OTEL_JAVA_AGENT_VERSION}"/opentelemetry-javaagent.jar -P ./otel-java-agent
 
   if [ "${env}" == "local" ]; then
-    docker build --no-cache -t local/otel-java-agent:latest --build-arg java_version="${JAVA_VERSION}" ./otel-java-agent/
+    downloadOtelJavaAgent
+    docker build --no-cache -t "local/otel-java-agent:$JAVA_VERSION-$OTEL_JAVA_AGENT_VERSION" --build-arg java_version="${JAVA_VERSION}" ./otel-java-agent/
     rm ./otel-java-agent/opentelemetry-javaagent.jar
 
   elif [ "${env}" == "prod" ]; then
+    downloadOtelJavaAgent
     docker build --no-cache -t "$REGISTRY/$REPOSITORY:$JAVA_VERSION-$OTEL_JAVA_AGENT_VERSION" --build-arg java_version="${JAVA_VERSION}" ./otel-java-agent/
     docker image push -a "$REGISTRY/$REPOSITORY"
 
