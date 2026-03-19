@@ -1,6 +1,6 @@
 services:
   surrealdb:
-    image: surrealdb/surrealdb:v2.6.1
+    image: surrealdb/surrealdb:v3.0.4
     container_name: surrealdb
     hostname: docker-local
     user: root
@@ -14,11 +14,11 @@ services:
     entrypoint: /surreal start --user root --pass root rocksdb:/data/mydatabase.db
 
   surrealist:
-    image: surrealdb/surrealist:3.7.0
+    image: surrealdb/surrealist:3.7.4
     container_name: surrealist
     hostname: docker-local
     ports:
-      - "8081:8080"
+      - "8080:8080"
     networks:
       - develop-network
 
