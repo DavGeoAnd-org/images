@@ -1,0 +1,49 @@
+services:
+  influxdb3-core:
+    image: influxdb:3-core
+    container_name: influxdb3-core
+    hostname: docker-local
+    user: root
+    ports:
+      - '8181:8181'
+    command:
+      - influxdb3
+      - serve
+      - --node-id=node0
+      - --object-store=file
+      - --data-dir=/var/lib/influxdb3/data
+      - --plugin-dir=/var/lib/influxdb3/plugins
+    volumes:
+      - influxdb3-core-data:/var/lib/influxdb3/data
+      - influxdb3-core-data:/var/lib/influxdb3/plugins
+    restart: unless-stopped
+    networks:
+      - develop-network
+#Token: apiv3_cfwSv8-SW9I4qCYPR5ot9vZCVlHc3PUiL9dIaVYPEFcZTLkUxbokVifkepZ4sUbcPEccyc-dKD94pFoGaD_ROg
+
+  influxdb3-explorer:
+    image: influxdata/influxdb3-ui:latest
+    container_name: influxdb3-explorer
+    hostname: docker-local
+    ports:
+      - "8888:8080"
+    networks:
+      - develop-network
+    volumes:
+      - influxdb3-explorer-data:/db
+      - ./config:/app-root/config:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./ca-certs:/ca-certs:ro
+    restart: unless-stopped
+    command: [ "--mode=admin" ]
+
+networks:
+  develop-network:
+    external: true
+    name: develop
+
+volumes:
+  influxdb3-core-data:
+    name: influxdb3-core-data
+  influxdb3-explorer-data:
+    name: influxdb3-explorer-data
