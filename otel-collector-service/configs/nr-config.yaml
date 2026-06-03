@@ -14,13 +14,17 @@ processors:
         - attributes["http.route"] == "/admin/health"
   resource/drop_unneeded_resource_attributes:
     attributes:
-      - key: k8s.pod.start_time
+      - key: host.arch
         action: delete
       - key: os.description
         action: delete
       - key: os.type
         action: delete
+      - key: os.version
+        action: delete
       - key: process.command_args
+        action: delete
+      - key: process.command_line
         action: delete
       - key: process.executable.path
         action: delete
@@ -30,13 +34,11 @@ processors:
         action: delete
       - key: process.runtime.name
         action: delete
-      - key: process.runtime.version
-        action: delete
 
 exporters:
   debug:
     verbosity: detailed
-  otlphttp/new_relic:
+  otlp_http/new_relic:
     endpoint: ${env:NEWRELIC_ENDPOINT:-default_endpoint}
     headers:
       api-key: ${env:NEWRELIC_APIKEY:-default_apikey}

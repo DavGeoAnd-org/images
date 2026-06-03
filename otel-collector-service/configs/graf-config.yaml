@@ -32,7 +32,7 @@ processors:
         action: delete
       - key: process.runtime.version
         action: delete
-  resourcedetection:
+  resource_detection:
     detectors: [ "env", "system" ]
     override: false
   transform/add_resource_attributes_as_metric_attributes:
@@ -46,7 +46,7 @@ processors:
 exporters:
   debug:
     verbosity: detailed
-  otlphttp/grafana_cloud:
+  otlp_http/grafana_cloud:
     endpoint: ${env:GRAFANA_ENDPOINT:-default_endpoint}
     auth:
       authenticator: basicauth/grafana_cloud
@@ -74,7 +74,7 @@ service:
       processors:
         - batch
         - resource/drop_unneeded_resource_attributes
-        - resourcedetection
+        - resource_detection
       exporters:
         - ${env:EXPORTER:-debug}
         - grafanacloud
@@ -84,7 +84,7 @@ service:
       processors:
         - batch
         - resource/drop_unneeded_resource_attributes
-        - resourcedetection
+        - resource_detection
         - transform/add_resource_attributes_as_metric_attributes
       exporters:
         - ${env:EXPORTER:-debug}
@@ -101,6 +101,6 @@ service:
       processors:
         - batch
         - resource/drop_unneeded_resource_attributes
-        - resourcedetection
+        - resource_detection
       exporters:
         - ${env:EXPORTER:-debug}

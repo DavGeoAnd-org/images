@@ -19,7 +19,7 @@ env:
   ECS_TASK_DEFINITION: otel-collector-service-prod
   ECS_TASK_DEFINITION_FILE: task-definition.json
   ECS_CLUSTER: homeproject-services-prod-ecs-cluster
-  CONFIG_TYPE: graf
+  CONFIG_TYPE: nr
 
 jobs:
   build:
