@@ -41,4 +41,4 @@ jobs:
 
       - name: Push the Docker image
         run: |
-          bash otel-java-agent/docker_build.sh $REPOSITORY prod ${{ steps.lookupJavaVersion.outputs.result }} ${{ steps.lookupOtelVersion.outputs.result }}
+          bash otel-java-agent/docker_build.sh prod ${{ steps.lookupJavaVersion.outputs.result }} ${{ steps.lookupOtelVersion.outputs.result }}
