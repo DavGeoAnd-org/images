@@ -34,6 +34,24 @@ processors:
         action: delete
       - key: process.runtime.name
         action: delete
+      - key: aws.ecs.cluster.arn
+        action: delete
+      - key: aws.ecs.container.arn
+        action: delete
+      - key: aws.ecs.container.image.id
+        action: delete
+      - key: aws.ecs.task.arn
+        action: delete
+      - key: aws.log.group.arns
+        action: delete
+      - key: aws.log.group.names
+        action: delete
+      - key: aws.log.stream.arns
+        action: delete
+      - key: aws.log.stream.names
+        action: delete
+      - key: cloud.resource_id
+        action: delete
 
 exporters:
   debug:
