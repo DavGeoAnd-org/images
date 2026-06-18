@@ -12,7 +12,7 @@ on:
       - otel-java-agent/version.yaml
 
 env:
-  REGISTRY: davgeoand9
+  REGISTRY: davidgandalcio
   REPOSITORY: otel-java-agent
 
 jobs:
@@ -29,8 +29,8 @@ jobs:
         with:
           cmd: yq '.java.version' 'otel-java-agent/version.yaml'
 
-      - name: Get otel version
-        id: lookupOtelVersion
+      - name: Get otel java agent version
+        id: lookupOtelJavaAgentVersion
         uses: mikefarah/yq@master
         with:
           cmd: yq '.otel-java-agent.version' 'otel-java-agent/version.yaml'
@@ -41,4 +41,4 @@ jobs:
 
       - name: Push the Docker image
         run: |
-          bash otel-java-agent/docker_build.sh prod ${{ steps.lookupJavaVersion.outputs.result }} ${{ steps.lookupOtelVersion.outputs.result }}
+          bash otel-java-agent/docker_build.sh prod ${{ steps.lookupJavaVersion.outputs.result }} ${{ steps.lookupOtelJavaAgentVersion.outputs.result }}
