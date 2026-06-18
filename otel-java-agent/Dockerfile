@@ -7,9 +7,11 @@ COPY opentelemetry-javaagent.jar /otel-agent/opentelemetry-javaagent.jar
 ENV JAVA_TOOL_OPTIONS='-javaagent:/otel-agent/opentelemetry-javaagent.jar'
 
 # otel general
+ENV OTEL_INSTRUMENTATION_MICROMETER_ENABLED=true
 
 # otel metrics
 ENV OTEL_METRICS_EXPORTER=none
+ENV OTEL_METRIC_EXPORT_INTERVAL=20000
 
 # otel logs
 ENV OTEL_LOGS_EXPORTER=none
