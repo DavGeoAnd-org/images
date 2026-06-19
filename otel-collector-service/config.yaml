@@ -89,6 +89,7 @@ service:
         - otlp
       processors:
         - batch
+        - filter/health_endpoint
         - resource/drop_unneeded_resource_attributes
         - resource_detection
       exporters:
