@@ -13,6 +13,12 @@ services:
       - develop-network
     env_file:
       - local.env
+    healthcheck:
+      test: ["CMD", "/otelcol-contrib", "--version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
   develop-network:

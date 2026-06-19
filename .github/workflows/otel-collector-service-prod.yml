@@ -16,8 +16,6 @@ env:
   REGISTRY: davidgandalcio
   REPOSITORY: otel-collector-service
   AWS_REGION: us-east-1
-  ECS_TASK_DEFINITION: otel-collector-service-prod
-  ECS_TASK_DEFINITION_FILE: task-definition.json
   ECS_CLUSTER: homeproject-services-prod-ecs-cluster
 
 jobs:
@@ -50,22 +48,62 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Download task definition
+      - name: Download javalin-template task definition
         run: |
-          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION }} --query taskDefinition > ${{ env.ECS_TASK_DEFINITION_FILE }}
+          aws ecs describe-task-definition --task-definition javalin-template-prod --query taskDefinition > javalin-template-task-definition.json
 
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
+      - name: Fill in the new image ID in the javalin-template task definition
+        id: task-def-javalin-template
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION_FILE }}
+          task-definition: javalin-template-task-definition.json
           container-name: ${{ env.REPOSITORY }}
           image: ${{ steps.push-image.outputs.image }}
 
-      - name: Deploy Amazon ECS task definition
+      - name: Deploy javalin-template task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.REPOSITORY }}
+          task-definition: ${{ steps.task-def-javalin-template.outputs.task-definition }}
+          service: javalin-template
           cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+          wait-for-service-stability: false
+
+      - name: Download planner-service task definition
+        run: |
+          aws ecs describe-task-definition --task-definition planner-service-prod --query taskDefinition > planner-service-task-definition.json
+
+      - name: Fill in the new image ID in the planner-service task definition
+        id: task-def-planner-service
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: planner-service-task-definition.json
+          container-name: ${{ env.REPOSITORY }}
+          image: ${{ steps.push-image.outputs.image }}
+
+      - name: Deploy planner-service task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def-planner-service.outputs.task-definition }}
+          service: planner-service
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: false
+
+      - name: Download games-service task definition
+        run: |
+          aws ecs describe-task-definition --task-definition games-service-prod --query taskDefinition > games-service-task-definition.json
+
+      - name: Fill in the new image ID in the games-service task definition
+        id: task-def-games-service
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: games-service-task-definition.json
+          container-name: ${{ env.REPOSITORY }}
+          image: ${{ steps.push-image.outputs.image }}
+
+      - name: Deploy games-service task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def-games-service.outputs.task-definition }}
+          service: games-service
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: false

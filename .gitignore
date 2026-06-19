@@ -3,3 +3,6 @@
 *.iws
 *.iml
 *.ipr
+
+### secrets
+otel-collector-service/local.env
