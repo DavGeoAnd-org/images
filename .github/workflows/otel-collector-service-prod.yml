@@ -13,13 +13,12 @@ on:
       - otel-collector-service/version.yaml
 
 env:
-  REGISTRY: davgeoand9
+  REGISTRY: davidgandalcio
   REPOSITORY: otel-collector-service
   AWS_REGION: us-east-1
   ECS_TASK_DEFINITION: otel-collector-service-prod
   ECS_TASK_DEFINITION_FILE: task-definition.json
   ECS_CLUSTER: homeproject-services-prod-ecs-cluster
-  CONFIG_TYPE: nr
 
 jobs:
   build:
@@ -42,7 +41,7 @@ jobs:
       - name: Push the Docker image
         id: push-image
         run: |
-          bash otel-collector-service/docker_build.sh $CONFIG_TYPE prod ${{ steps.lookupOtelCollectorVersion.outputs.result }}
+          bash otel-collector-service/docker_build.sh prod ${{ steps.lookupOtelCollectorVersion.outputs.result }}
 
       - name: Configure AWS Creds
         uses: aws-actions/configure-aws-credentials@v4

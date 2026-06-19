@@ -11,10 +11,8 @@ services:
       - "55679:55679"
     networks:
       - develop-network
-    environment:
-      - EXPORTER=otlp_http/new_relic
-      - NEWRELIC_ENDPOINT=https://otlp.nr-data.net
-      - NEWRELIC_APIKEY=b8808def9ddc8a94cad3d450c5c78299FFFFNRAL
+    env_file:
+      - local.env
 
 networks:
   develop-network:

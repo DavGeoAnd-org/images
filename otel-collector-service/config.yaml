@@ -1,0 +1,121 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+  filter/health_endpoint:
+    traces:
+      span:
+        - attributes["http.route"] == "/admin/health"
+  resource/drop_unneeded_resource_attributes:
+    attributes:
+      - key: host.arch
+        action: delete
+      - key: os.description
+        action: delete
+      - key: os.type
+        action: delete
+      - key: os.version
+        action: delete
+      - key: process.command_args
+        action: delete
+      - key: process.command_line
+        action: delete
+      - key: process.executable.path
+        action: delete
+      - key: process.pid
+        action: delete
+      - key: process.runtime.description
+        action: delete
+      - key: process.runtime.name
+        action: delete
+      - key: aws.ecs.cluster.arn
+        action: delete
+      - key: aws.ecs.container.arn
+        action: delete
+      - key: aws.ecs.container.image.id
+        action: delete
+      - key: aws.ecs.task.arn
+        action: delete
+      - key: aws.log.group.arns
+        action: delete
+      - key: aws.log.group.names
+        action: delete
+      - key: aws.log.stream.arns
+        action: delete
+      - key: aws.log.stream.names
+        action: delete
+      - key: cloud.resource_id
+        action: delete
+  resource_detection:
+    detectors: [ "env", "system" ]
+    override: false
+  cumulativetodelta:
+    max_staleness: 0
+
+exporters:
+  debug:
+    verbosity: detailed
+  influxdb:
+    endpoint: ${env:INFLUXDB_ENDPOINT:-influxdb_endpoint}
+    org: ${env:INFLUXDB_ORG:-influxdb_org}
+    bucket: ${env:INFLUXDB_BUCKET:-influxdb_bucket}
+    token: ${env:INFLUXDB_TOKEN:-influxdb_token}
+    metrics_schema: telegraf-prometheus-v1
+  otlp_http/grafana_cloud:
+    endpoint: ${env:GRAFANA_ENDPOINT:-grafana_endpoint}
+    headers:
+      Authorization: ${env:GRAFANA_AUTH:-grafana_auth}
+
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+
+connectors:
+  grafanacloud:
+    host_identifiers: [ "host.name" ]
+
+service:
+  extensions:
+    - health_check
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - resource/drop_unneeded_resource_attributes
+        - resource_detection
+      exporters:
+        - ${env:TRACES_EXPORTER:-debug}
+        - grafanacloud
+    metrics:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - resource/drop_unneeded_resource_attributes
+        - cumulativetodelta
+      exporters:
+        - ${env:METRICS_EXPORTER:-debug}
+    metrics/grafanacloud:
+      receivers:
+        - grafanacloud
+      processors:
+        - batch
+      exporters:
+        - ${env:METRICS_GC_EXPORTER:-debug}
+    logs:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - resource/drop_unneeded_resource_attributes
+        - resource_detection
+      exporters:
+        - ${env:LOGS_EXPORTER:-debug}

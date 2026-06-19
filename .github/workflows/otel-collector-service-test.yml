@@ -14,13 +14,12 @@ on:
       - otel-collector-service/version.yaml
 
 env:
-  REGISTRY: davgeoand9
+  REGISTRY: davidgandalcio
   REPOSITORY: otel-collector-service
   AWS_REGION: us-east-1
   ECS_TASK_DEFINITION: otel-collector-service-test
   ECS_TASK_DEFINITION_FILE: task-definition.json
   ECS_CLUSTER: homeproject-services-test-ecs-cluster
-  CONFIG_TYPE: nr
 
 jobs:
   build:
@@ -43,7 +42,7 @@ jobs:
       - name: Push the Docker image
         id: push-image
         run: |
-          bash otel-collector-service/docker_build.sh $CONFIG_TYPE test ${{ steps.lookupOtelCollectorVersion.outputs.result }} ${GITHUB_SHA::7}
+          bash otel-collector-service/docker_build.sh test ${{ steps.lookupOtelCollectorVersion.outputs.result }} ${GITHUB_SHA::7}
 
       - name: Configure AWS Creds
         uses: aws-actions/configure-aws-credentials@v4
@@ -54,13 +53,13 @@ jobs:
 
       - name: Download task definition
         run: |
-          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION }} --query taskDefinition > ${{ env.ECS_TASK_DEFINITION_FILE }}
+          aws ecs describe-task-definition --task-definition javalin-template-test --query taskDefinition > javalin-template-task-definition.json
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION_FILE }}
+          task-definition: javalin-template-task-definition.json
           container-name: ${{ env.REPOSITORY }}
           image: ${{ steps.push-image.outputs.image }}
 
@@ -68,6 +67,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.REPOSITORY }}
+          service: javalin-template
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true

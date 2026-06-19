@@ -1,2 +1,3 @@
+#https://github.com/open-telemetry/opentelemetry-collector-contrib/releases
 otel-collector-contrib:
-  version: 0.153.0
+  version: 0.154.0
