@@ -1,8 +1,6 @@
 services:
   surrealdb:
     image: surrealdb/surrealdb:latest
-    container_name: surrealdb
-    hostname: docker-local
     user: root
     ports:
       - "8000:8000"
@@ -15,8 +13,6 @@ services:
 
   surrealist:
     image: surrealdb/surrealist:latest
-    container_name: surrealist
-    hostname: docker-local
     ports:
       - "8080:8080"
     networks:
