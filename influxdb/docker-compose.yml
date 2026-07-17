@@ -1,8 +1,6 @@
 services:
   influxdb3-core:
     image: influxdb:3-core
-    container_name: influxdb3-core
-    hostname: docker-local
     user: root
     ports:
       - '8181:8181'
@@ -19,21 +17,21 @@ services:
     restart: unless-stopped
     networks:
       - develop-network
-#Token: apiv3_cfwSv8-SW9I4qCYPR5ot9vZCVlHc3PUiL9dIaVYPEFcZTLkUxbokVifkepZ4sUbcPEccyc-dKD94pFoGaD_ROg
+#influxdb3 create token --admin
+#Token: apiv3_R87ShFdegjh_xFi8d1o57FN-kDS7r0WVAqz_jleqRi4zFeliXBZNqT8ILSno3H6qfvLXeMvU-bKuGYCQQFTsSQ
 
   influxdb3-explorer:
     image: influxdata/influxdb3-ui:latest
-    container_name: influxdb3-explorer
-    hostname: docker-local
     ports:
       - "8888:8080"
     networks:
       - develop-network
     volumes:
-      - influxdb3-explorer-data:/db
       - ./config:/app-root/config:ro
+      - influxdb3-explorer-data:/db
       - ./ssl:/etc/nginx/ssl:ro
       - ./ca-certs:/ca-certs:ro
+      - ./admin-instructions:/app-root/admin-instructions:ro
     restart: unless-stopped
     command: [ "--mode=admin" ]
 
