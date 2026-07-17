@@ -1,7 +1,7 @@
 services:
-  influxdb3-core:
+  influxdb:
     image: influxdb:3-core
-    container_name: influxdb3-core
+    container_name: influxdb
     hostname: docker-local
     user: root
     ports:
@@ -9,33 +9,38 @@ services:
     command:
       - influxdb3
       - serve
-      - --node-id=node0
+      - --node-id=docker-local-node
       - --object-store=file
       - --data-dir=/var/lib/influxdb3/data
       - --plugin-dir=/var/lib/influxdb3/plugins
     volumes:
-      - influxdb3-core-data:/var/lib/influxdb3/data
-      - influxdb3-core-data:/var/lib/influxdb3/plugins
+      - influxdb-data:/var/lib/influxdb3/data
+      - influxdb-data:/var/lib/influxdb3/plugins
     restart: unless-stopped
     networks:
       - develop-network
-#Token: apiv3_cfwSv8-SW9I4qCYPR5ot9vZCVlHc3PUiL9dIaVYPEFcZTLkUxbokVifkepZ4sUbcPEccyc-dKD94pFoGaD_ROg
+#Token: apiv3_hjhSehgKdbeUrRKOHpQzrFegAvsqAH5m-TSpW7OVXuoBwNC0pRSjWZZWsEuPg-lWNRY6coybqVl2bVDA8s2yvg
 
-  influxdb3-explorer:
+  influxdb-ui:
     image: influxdata/influxdb3-ui:latest
-    container_name: influxdb3-explorer
+    container_name: influxdb-ui
     hostname: docker-local
     ports:
       - "8888:8080"
     networks:
       - develop-network
     volumes:
-      - influxdb3-explorer-data:/db
+      - influxdb-ui-data:/db
       - ./config:/app-root/config:ro
       - ./ssl:/etc/nginx/ssl:ro
       - ./ca-certs:/ca-certs:ro
     restart: unless-stopped
     command: [ "--mode=admin" ]
+    environment:
+      - DEFAULT_INFLUX_SERVER=http://influxdb:8181
+      - DEFAULT_INFLUX_DATABASE=services
+      - DEFAULT_API_TOKEN=apiv3_hjhSehgKdbeUrRKOHpQzrFegAvsqAH5m-TSpW7OVXuoBwNC0pRSjWZZWsEuPg-lWNRY6coybqVl2bVDA8s2yvg
+      - DEFAULT_SERVER_NAME=local
 
 networks:
   develop-network:
@@ -43,7 +48,7 @@ networks:
     name: develop
 
 volumes:
-  influxdb3-core-data:
-    name: influxdb3-core-data
-  influxdb3-explorer-data:
-    name: influxdb3-explorer-data
+  influxdb-data:
+    name: influxdb-data
+  influxdb-ui-data:
+    name: influxdb-ui-data

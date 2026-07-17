@@ -1,0 +1,14 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB Services
+    type: influxdb
+    uid: influxdb_services
+    url: http://influxdb:8181
+    jsonData:
+      dbName: services
+      insecureGrpc: true
+      httpMode: POST
+      version: SQL
+    secureJsonData:
+      token: apiv3_hjhSehgKdbeUrRKOHpQzrFegAvsqAH5m-TSpW7OVXuoBwNC0pRSjWZZWsEuPg-lWNRY6coybqVl2bVDA8s2yvg
