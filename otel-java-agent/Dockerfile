@@ -1,6 +1,6 @@
 ARG java_version=latest
 
-FROM eclipse-temurin:${java_version}-jre-noble
+FROM eclipse-temurin:${java_version}-jre-ubi10-minimal
 
 COPY opentelemetry-javaagent.jar /otel-agent/opentelemetry-javaagent.jar
 
