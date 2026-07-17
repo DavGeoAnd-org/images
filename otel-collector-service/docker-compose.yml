@@ -1,8 +1,6 @@
 services:
   otel-collector-service:
     image: local/otel-collector-service:latest
-    container_name: otel-collector-service
-    hostname: docker-local
     ports:
       - "4317:4317"
       - "4318:4318"

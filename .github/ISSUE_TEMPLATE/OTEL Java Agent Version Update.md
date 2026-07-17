@@ -3,7 +3,7 @@ name: OTEL Java Agent Version Update
 about: update version for OTEL java agent image
 title: OTEL Java Agent Version Update (Month Year)
 labels: aws, image, monitoring
-assignees: DavGeoAnd
+assignees: davidgandalcio
 
 ---
 
